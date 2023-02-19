@@ -38,6 +38,7 @@
         <button id="lightsOff" type="button" class="btn btn-light">Zgaś światło nocne</button>
       </div>
     </div>
+    <div class="row"> <p id="status"></p> </div>
   </div>
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -58,18 +59,31 @@
 "sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
     crossorigin="anonymous"></script>
   <script type="text/javascript">
+    function reqListener() {
+      console.log(this.responseText);
+      $('#status').text("Data: " + this.responseText); 
+    }
+    function get(url, callback){
+      const req = new XMLHttpRequest();
+      if (callback) req.addEventListener("load", callback);
+      req.open("GET", window.location.href + url);
+      req.send();
+    }
     $("#lightsDayDoorOpen").button().click(function(){
-        document.location.href = '/lightsDayDoorOpen'
+        get("lightsDayDoorOpen")
     }); 
     $("#lightsNight").button().click(function(){
-        document.location.href = '/lightsNight'
+        get("lightsNight")
     }); 
     $("#doorClosed").button().click(function(){
-        document.location.href = '/doorClosed'
+        get("doorClosed")
     }); 
     $("#lightsOff").button().click(function(){
-        document.location.href = '/lightsOff'
+        get("lightsOff")
     }); 
+
+    
+    setInterval(async () => { get("status", reqListener);}, 5000);
   </script>
 </body>
 </html>

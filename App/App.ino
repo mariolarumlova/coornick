@@ -6,14 +6,14 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPClient.h> //needed?
 #include <ArduinoJson.h>
+#include "tmp.h"
 
 #ifndef STASSID
 #define STASSID "Karuzelakaruzela"
 #define STAPSK "naolbinieconiedziela"
 #endif
 
-#define html "<!DOCTYPE html><html lang=\"en\"><head> <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css\"    integrity=\"sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS\"    crossorigin=\"anonymous\">  <title>Kurnik Państwa Nowaków</title>  <style>    h1 {      color: grey;      text-align: center;    }    div.one {      margin-top: 40px;      text-align: center;    }    button {      margin-top: 10px;    }  </style></head><body>  <div class=\"container\">    <h1>Ko, ko, ko!</h1>    <div class=\"one\">      <div class=\"row\">        <button id=\"lightsDayDoorOpen\" type=\"button\" class=\"btn btn-light\">Otwórz drzwiczki i zapal światło dzienne</button>      </div>      <div class=\"row\">        <button id=\"lightsNight\" type=\"button\" class=\"btn btn-light\">Zapal światło nocne i zgaś dzienne</button>      </div>      <div class=\"row\">        <button id=\"doorClosed\" type=\"button\" class=\"btn btn-light\">Zamknij drzwiczki</button>      </div>      <div class=\"row\">        <button id=\"lightsOff\" type=\"button\" class=\"btn btn-light\">Zgaś światło nocne</button>      </div>    </div>  </div>  <!-- Optional JavaScript -->  <!-- jQuery first, then Popper.js, then Bootstrap JS -->    <script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"    integrity=\"sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo\"    crossorigin=\"anonymous\"></script>  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js\"    integrity=\"sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut\"    crossorigin=\"anonymous\"></script>  <script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js\"    integrity=\"sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k\"    crossorigin=\"anonymous\"></script>  <script type=\"text/javascript\">    $(\"#lightsDayDoorOpen\").button().click(function(){        document.location.href = '/lightsDayDoorOpen'    });     $(\"#lightsNight\").button().click(function(){        document.location.href = '/lightsNight'    });     $(\"#doorClosed\").button().click(function(){        document.location.href = '/doorClosed'    });     $(\"#lightsOff\").button().click(function(){        document.location.href = '/lightsOff'    });   </script></body></html>"
-
+#define html "<!DOCTYPE html><html lang=\"en\"><head>  <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css\"    integrity=\"sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS\"    crossorigin=\"anonymous\">  <title>Kurnik Państwa Nowaków</title>  <style>    h1 {      color: grey;      text-align: center;    }    div.one {      margin-top: 40px;      text-align: center;    }    button {      margin-top: 10px;    }  </style></head><body>  <div class=\"container\">    <h1>Ko, ko, ko!</h1>    <div class=\"one\">      <div class=\"row\">        <button id=\"lightsDayDoorOpen\" type=\"button\" class=\"btn btn-light\">Otwórz drzwiczki i zapal światło dzienne</button>      </div>      <div class=\"row\">        <button id=\"lightsNight\" type=\"button\" class=\"btn btn-light\">Zapal światło nocne i zgaś dzienne</button>      </div>      <div class=\"row\">        <button id=\"doorClosed\" type=\"button\" class=\"btn btn-light\">Zamknij drzwiczki</button>      </div>      <div class=\"row\">        <button id=\"lightsOff\" type=\"button\" class=\"btn btn-light\">Zgaś światło nocne</button>      </div>    </div>    <div class=\"row\"> <p id=\"status\"></p> </div>  </div>  <!-- Optional JavaScript -->  <!-- jQuery first, then Popper.js, then Bootstrap JS -->    <script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"    integrity=\"sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo\"    crossorigin=\"anonymous\"></script>  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js\"    integrity=\"sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut\"    crossorigin=\"anonymous\"></script>  <script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js\"    integrity=\"sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k\"    crossorigin=\"anonymous\"></script>  <script type=\"text/javascript\">    function reqListener() {      console.log(this.responseText);      $('#status').text(\"Data: \" + this.responseText);     }    function get(url, callback){      const req = new XMLHttpRequest();      if (callback) req.addEventListener(\"load\", callback);      req.open(\"GET\", window.location.href + url);      req.send();    }    $(\"#lightsDayDoorOpen\").button().click(function(){        get(\"lightsDayDoorOpen\")    });     $(\"#lightsNight\").button().click(function(){        get(\"lightsNight\")    });     $(\"#doorClosed\").button().click(function(){        get(\"doorClosed\")    });     $(\"#lightsOff\").button().click(function(){        get(\"lightsOff\")    });         setInterval(async () => { get(\"status\", reqListener);}, 5000);  </script></body></html>"
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
@@ -22,8 +22,15 @@ ESP8266WiFiMulti WiFiMulti;
 
 const int LIGHTS_DAY_RELAY_PIN = D5;  // the Arduino pin, which connects to the IN pin of relay
 const int LIGHTS_NIGHT_RELAY_PIN = D1;
-// const int ENGINE_RELAY_PIN = D6;
-// const int BUTTON_PIN = D7;
+// const int enA = D6;
+const int in1 = D1;
+const int in2 = D2;
+const int SENSOR_DOOR_OPEN = D0;
+const int SENSOR_DOOR_CLOSED = RX;
+
+int rotDirection = 0;
+int isDayLightOn = 0;
+int isNightLightOn = 0;
 
 const int LIGHTS_DAY_DOOR_OPEN_PERIOD = 7 * 4 + 2; // action 1
 const int LIGHTS_NIGHT_PERIOD = 17 * 4; // action 2
@@ -38,8 +45,18 @@ const unsigned long hourCheckInterval = 15 * 60 * 1000; // 15min
 unsigned long previousHourCheckTime = 0;
 
 void setup(void) {
+  tmp_setup();
   pinMode(LIGHTS_DAY_RELAY_PIN, OUTPUT);
   pinMode(LIGHTS_NIGHT_RELAY_PIN, OUTPUT);
+
+  // pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(SENSOR_DOOR_OPEN, INPUT);
+  // pinMode(SENSOR_DOOR_CLOSED, INPUT);
+  // Set initial rotation direction
+  // digitalWrite(in1, LOW);
+  // digitalWrite(in2, HIGH);
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
@@ -77,6 +94,11 @@ void setup(void) {
   server.on("/lightsOff", []() {
     lightsOff();
   });
+  Serial.begin(9600);
+  while (!Serial) continue;
+  server.on("/status", []() {
+    getCoornickStatus();
+  });
 
   server.on("/getTime", []() {
     httpGet("http://worldtimeapi.org/api/ip");
@@ -86,6 +108,7 @@ void setup(void) {
 
   server.begin();
   Serial.println("HTTP server started");
+
 }
 
 void loop(void) {
@@ -94,7 +117,7 @@ void loop(void) {
 
   unsigned long currentTime = millis();
   if( currentTime - previousHourCheckTime >= hourCheckInterval ){
-    previousHourCheckTime = currentTime;
+    previousHourCheckTime = currentTime; // pass currentTime as a parameter and assign only when downloaded
     httpGet("http://worldtimeapi.org/api/ip");
   }
 
@@ -178,15 +201,19 @@ void lightsDayDoorOpen() {
   lastAction = 1;
   Serial.println("Lights: day, door: open.");
   digitalWrite(LIGHTS_DAY_RELAY_PIN, LOW);
+  isDayLightOn = 1;
+  isNightLightOn = 0;
   digitalWrite(LIGHTS_NIGHT_RELAY_PIN, HIGH);
   server.send(200, "text/plain;charset=UTF-8", "Dzień dobry, kurki!");
-  //turn the engine on
+  openDoor();
 }
 void lightsNight() {
   lastAction = 2;
   Serial.println("Lights: night, door: open.");
   digitalWrite(LIGHTS_DAY_RELAY_PIN, HIGH);
   digitalWrite(LIGHTS_NIGHT_RELAY_PIN, LOW);
+  isDayLightOn = 0;
+  isNightLightOn = 1;
   server.send(200, "text/plain", "Kurki, kurki do domu!");
 }
 void doorClosed() {
@@ -194,19 +221,22 @@ void doorClosed() {
   Serial.println("Lights: night, door: closed.");
   server.send(200, "text/plain", "Zamykamy drzwiczki!");
   //turn the engine on
+  closeDoor();
 }
 void lightsOff() {
   lastAction = 4;
   Serial.println("Lights: off, door: closed.");
   digitalWrite(LIGHTS_DAY_RELAY_PIN, HIGH);
   digitalWrite(LIGHTS_NIGHT_RELAY_PIN, HIGH);
+  isDayLightOn = 0;
+  isNightLightOn = 0;
   server.send(200, "text/plain", "Dobranoc, kurki!");
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
 }
 
 void handleRoot() {
-  digitalWrite(LIGHTS_DAY_RELAY_PIN, LOW);
   server.send(200, "text/html;charset=UTF-8", html);
-  digitalWrite(LIGHTS_DAY_RELAY_PIN, HIGH);
 }
 
 void handleNotFound() {
@@ -222,4 +252,35 @@ void handleNotFound() {
   for (uint8_t i = 0; i < server.args(); i++) { message += " " + server.argName(i) + ": " + server.arg(i) + "\n"; }
   server.send(404, "text/plain", message);
   digitalWrite(LIGHTS_DAY_RELAY_PIN, HIGH);
+}
+
+void openDoor() {
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  rotDirection = 1;
+  while (digitalRead(SENSOR_DOOR_OPEN) == LOW) {
+    Serial.println("Opening . . .");
+  }
+  stopDoor();
+}
+
+void closeDoor() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  rotDirection = 0;
+  while (digitalRead(SENSOR_DOOR_CLOSED) == LOW) {
+    Serial.println("Closing . . .");
+  }
+  stopDoor();
+}
+
+void stopDoor() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+}
+
+void getCoornickStatus() {
+  char buffer[100];
+  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d}", isDayLightOn, isNightLightOn);
+  server.send(200, "application/json", buffer); 
 }
