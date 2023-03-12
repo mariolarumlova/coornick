@@ -4,6 +4,11 @@ const int LIGHTS_NIGHT_RELAY_PIN = D6;
 int isDayLightOn = 0;
 int isNightLightOn = 0;
 
+void setupLights() {
+  pinMode(LIGHTS_DAY_RELAY_PIN, OUTPUT);
+  pinMode(LIGHTS_NIGHT_RELAY_PIN, OUTPUT);
+}
+
 void turnDayLightsOn() {
   digitalWrite(LIGHTS_DAY_RELAY_PIN, LOW);
   digitalWrite(LIGHTS_NIGHT_RELAY_PIN, HIGH);

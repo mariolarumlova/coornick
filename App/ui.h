@@ -10,6 +10,7 @@ const char html [] PROGMEM = R"=====(
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
     rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kurnik Państwa Nowaków</title>
   <style>
     h1 {
@@ -23,46 +24,53 @@ const char html [] PROGMEM = R"=====(
     button {
       margin-top: 10px;
     }
+    .customRow {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container-fluid">
     <div id="alert" class="alert alert-success" role="alert">
       <p id="alertText"></p>
     </div>
-    <h1>Ko, ko, ko!</h1>
+    <!-- TODO: Add logo -->
     <div class="one">
-      <div class="row">
-        <button id="lightsDayDoorOpen" type="button" class="btn btn-light">Otwórz drzwiczki i zapal światło dzienne</button>
+      <div class="row customRow">
+        <div class="col text-center">
+          <button id="openHoursModal" type="button" class="btn btn-light">
+            Zaplanuj pracę kurnika
+          </button>
+        </div>
       </div>
-      <div class="row">
-        <button id="lightsNight" type="button" class="btn btn-light">Zmień światło na nocne</button>
+      <div class="row customRow">
+        <div class="col text-center">
+          <div class="custom-control custom-switch">
+            <label class="custom-control-label" for="dayLightSwitch"><span class="material-symbols-outlined">light_mode</span> Światło dzienne</label>
+            <input type="checkbox" class="custom-control-input" id="dayLightSwitch" disabled>
+          </div>
+        </div>
       </div>
-      <div class="row">
-        <button id="doorClosed" type="button" class="btn btn-light">Zamknij drzwiczki</button>
+      <div class="row customRow">
+        <div class="col text-center">
+          <div class="custom-control custom-switch">
+            <label class="custom-control-label" for="nightLightSwitch"><span class="material-symbols-outlined">nightlight</span> Światło nocne</label>
+            <input type="checkbox" class="custom-control-input" id="nightLightSwitch" disabled>
+          </div>
+        </div>
       </div>
-      <div class="row">
-        <button id="lightsOff" type="button" class="btn btn-light">Zgaś światła</button>
-      </div>
-      <div class="row marginTop">
-        <button id="openModal" type="button" class="btn btn-light">
-          Zaplanuj pracę kurnika
-        </button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="custom-control custom-switch">
-        <input type="checkbox" class="custom-control-input" id="dayLightSwitch" disabled>
-        <label class="custom-control-label" for="dayLightSwitch"><span class="material-symbols-outlined">light_mode</span>Światło dzienne</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="custom-control custom-switch">
-        <input type="checkbox" class="custom-control-input" id="nightLightSwitch" disabled>
-        <label class="custom-control-label" for="nightLightSwitch"><span class="material-symbols-outlined">nightlight</span>Światło nocne</label>
+      <!-- TODO: Add main switch -->
+      <div class="row customRow">
+        <div class="col text-center">
+          <button id="openManualActionsModal" type="button" class="btn btn-light">
+            Wywołaj ręcznie akcję
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
   <!-- Modal hours-->
   <div class="modal fade" id="scheduleActionsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -103,6 +111,40 @@ const char html [] PROGMEM = R"=====(
       </div>
     </div>
   </div>
+
+  <!-- Modal manual actions -->
+  <div class="modal fade" id="manualActionsModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Wywołaj ręcznie akcję</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <button id="lightsDayDoorOpen" type="button" class="btn btn-light">Otwórz drzwiczki i zapal światło dzienne</button>
+            </div>
+            <div class="form-group">
+              <button id="lightsNight" type="button" class="btn btn-light">Zmień światło na nocne</button>
+            </div>
+            <div class="form-group">
+              <button id="doorClosed" type="button" class="btn btn-light">Zamknij drzwiczki</button>
+            </div>
+            <div class="form-group">
+              <button id="lightsOff" type="button" class="btn btn-light">Zgaś światła</button>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-dismiss="modal">Zamknij</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   
@@ -215,10 +257,13 @@ const char html [] PROGMEM = R"=====(
     $("#lightsOff").button().click(function(){
         get("lightsOff", () => showSuccessToast("Akcja wykonana poprawnie"), (err) => showErrorToast("Wystąpił błąd!", err))
     }); 
-    $("#openModal").button().click(function(){
+    $("#openHoursModal").button().click(function(){
       parseActionTimes();
       $('#scheduleActionsModal').modal('show');
         // get("actionTimes", parseActionTimes); //TODO
+    }); 
+    $("#openManualActionsModal").button().click(function(){
+      $('#manualActionsModal').modal('show');
     }); 
     $("#scheduleActions").button().click(function(){
         const hours = {

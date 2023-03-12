@@ -8,6 +8,14 @@ int isDoorClosing = 0;
 int isDoorOpening = 0;
 int isDoorLocked = 0;
 
+void setupDoor() {
+  pinMode(LOCKER_RELAY_PIN, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(SENSOR_DOOR_OPEN, INPUT);
+  pinMode(SENSOR_DOOR_CLOSED, INPUT);
+}
+
 void openDoor() {
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);

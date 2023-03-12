@@ -12,6 +12,8 @@
 #include "endpoints.h"
 #include "datetimeCheck.h"
 
+bool coornickTurnedOn = true;
+
 // default action times [15min periods]
 int lightsDayDoorOpenPeriod = 7 * 4 + 2;
 int lightsNightPeriod = 17 * 4;
@@ -21,20 +23,9 @@ int lightsOffPeriod = 20 * 4 + 2;
 int period = 100;
 int lastAction = 4;
 
-void lightsDayDoorOpen();
-void lightsNight();
-void doorClosed();
-void lightsOff();
-void getCoornickStatus();
-
 void setup(void) {
-  pinMode(LIGHTS_DAY_RELAY_PIN, OUTPUT);
-  pinMode(LIGHTS_NIGHT_RELAY_PIN, OUTPUT);
-  pinMode(LOCKER_RELAY_PIN, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(SENSOR_DOOR_OPEN, INPUT);
-  pinMode(SENSOR_DOOR_CLOSED, INPUT);
+  setupLights();
+  setupDoor();
 
   setupServer();
   setupEndpoint("/lightsDayDoorOpen", []() {
@@ -58,6 +49,9 @@ void setup(void) {
   setupEndpoint("/setActionTimes", []() {
     setActionTimes();
   });
+  setupEndpoint("/coornickSwitch", []() {
+    coornickSwitch();
+  });
   setupEndpoint("/getTime", []() {
     datetimeCheck(httpGet, [](int newPeriod) {
       updatePeriod(newPeriod);
@@ -69,50 +63,48 @@ void setup(void) {
 
 void loop(void) {
   loopServer();
-  loopDatetimeCheck(httpGet, [](int newPeriod) {
-    updatePeriod(newPeriod);
-  });
+  if (coornickTurnedOn) {
+    loopDatetimeCheck(httpGet, [](int newPeriod) {
+      updatePeriod(newPeriod);
+    });
+  }
   checkDoorOpened();
   checkDoorClosed();
 }
 
 void lightsDayDoorOpen() {
   lastAction = 1;
-  Serial.println("Lights: day, door: open.");
   unlockDoor();
   turnDayLightsOn();
-  server.send(200, "text/plain;charset=UTF-8", "Dzień dobry, kurki!");
   delay(500);
   openDoor();
+  server.send(200, "text/plain;charset=UTF-8", "Lights: day, door: open.");
 }
 
 void lightsNight() {
   lastAction = 2;
-  Serial.println("Lights: night, door: open.");
   turnNightLightsOn();
-  server.send(200, "text/plain", "Kurki, kurki do domu!");
+  server.send(200, "text/plain", "Lights: night, door: open.");
 }
 
 void doorClosed() {
   lastAction = 3;
-  Serial.println("Lights: night, door: closed.");
   closeDoor();
-  server.send(200, "text/plain", "Zamykamy drzwiczki!");
+  server.send(200, "text/plain", "Lights: night, door: closed.");
 }
 
 void lightsOff() {
   lastAction = 4;
-  Serial.println("Lights: off, door: closed.");
   turnAllLightsOff();
   stopDoor();
   lockDoor();
-  server.send(200, "text/plain", "Dobranoc, kurki!");
+  server.send(200, "text/plain", "Lights: off, door: closed.");
 }
 
 void getCoornickStatus() {
-  char buffer[100];
-  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d, \"isDoorLocked\": %d, \"isDoorOpening\": %d, \"isDoorClosing\": %d}", 
-    isDayLightOn, isNightLightOn, isDoorLocked, isDoorOpening, isDoorClosing);
+  char buffer[200];
+  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d, \"isDoorLocked\": %d, \"isDoorOpening\": %d, \"isDoorClosing\": %d, \"coornickTurnedOn\": %d}", 
+    isDayLightOn, isNightLightOn, isDoorLocked, isDoorOpening, isDoorClosing, coornickTurnedOn);
   server.send(200, "application/json", buffer); 
 }
 
@@ -125,8 +117,20 @@ void setActionTimes() {
   lightsNightPeriod = server.arg("lightsNight").toInt();
   doorClosedPeriod = server.arg("doorClosed").toInt();
   lightsOffPeriod = server.arg("lightsOff").toInt();
-  updatePeriod(period);
-  server.send(200, "text/plain", "Godziny zmienione");
+  datetimeCheck(httpGet, [](int newPeriod) {
+    updatePeriod(newPeriod);
+  });
+  server.send(200, "text/plain", "Period times updated.");
+}
+
+void coornickSwitch() {
+  int previousState = server.arg("previousState").toInt();
+  coornickTurnedOn = !previousState;
+  if (coornickTurnedOn) {
+    server.send(200, "text/plain", "Coornik activated.");
+  } else {
+    server.send(200, "text/plain", "Coornik deactivated.");
+  }
 }
 
 void updatePeriod(int newPeriod)
