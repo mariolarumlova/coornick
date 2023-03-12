@@ -109,7 +109,10 @@ void getCoornickStatus() {
 }
 
 void getActionTimes() {
-  //TODO
+  char buffer[200];
+  sprintf(buffer, "{\"lightsDayDoorOpen\": %d, \"lightsNight\": %d, \"doorClosed\": %d, \"lightsOff\": %d}", 
+    lightsDayDoorOpenPeriod, lightsNightPeriod, doorClosedPeriod, lightsOffPeriod);
+  server.send(200, "application/json", buffer); 
 }
 
 void setActionTimes() {

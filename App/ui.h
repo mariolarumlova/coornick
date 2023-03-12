@@ -47,7 +47,9 @@ const char html [] PROGMEM = R"=====(
       <div class="row customRow">
         <div class="col text-center">
           <div class="custom-control custom-switch">
-            <label class="custom-control-label" for="dayLightSwitch"><span class="material-symbols-outlined">light_mode</span> Światło dzienne</label>
+            <label class="custom-control-label text-right" for="dayLightSwitch">
+              <span class="material-symbols-outlined">light_mode</span> Światło dzienne
+            </label>
             <input type="checkbox" class="custom-control-input" id="dayLightSwitch" disabled>
           </div>
         </div>
@@ -55,12 +57,21 @@ const char html [] PROGMEM = R"=====(
       <div class="row customRow">
         <div class="col text-center">
           <div class="custom-control custom-switch">
-            <label class="custom-control-label" for="nightLightSwitch"><span class="material-symbols-outlined">nightlight</span> Światło nocne</label>
+            <label class="custom-control-label" for="nightLightSwitch">
+              <span class="material-symbols-outlined">nightlight</span> Światło nocne
+            </label>
             <input type="checkbox" class="custom-control-input" id="nightLightSwitch" disabled>
           </div>
         </div>
       </div>
       <!-- TODO: Add main switch -->
+      <div class="row customRow">
+        <div class="col text-center">
+          <button id="switchKurnik" type="button" class="btn btn-light">
+            <p id="switchKurnikText"></p>
+          </button>
+        </div>
+      </div>
       <div class="row customRow">
         <div class="col text-center">
           <button id="openManualActionsModal" type="button" class="btn btn-light">
@@ -164,27 +175,23 @@ const char html [] PROGMEM = R"=====(
 "sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
     crossorigin="anonymous"></script>
   <script type="text/javascript">
+    let kurnikTurnedOn = 1;
     function parseStatus(responseText) {
       const response = JSON.parse(responseText);
       console.log(response);
       // TODO: add door status
       $('#dayLightSwitch').prop( "checked", response.dayLights);
       $('#nightLightSwitch').prop( "checked", response.nightLights);
+      $('#switchKurnikText').text(response.coornickTurnedOn ? "Wyłącz kurnik" : "Włącz kurnik"); 
+      kurnikTurnedOn = response.coornickTurnedOn;
     }
     function periodToTime(period) {
       const hours = `${Math.floor(period / 4)}`.padStart(2, '0');
       const minutes = `${period % 4 * 15}`.padStart(2, '0');
       return `${hours}:${minutes}`;
     }
-    function parseActionTimes() {
-      // const actionTimes = JSON.parse(this.responseText);
-      // console.log(actionTimes);
-      const actionTimes = {
-        lightsDayDoorOpen: 7 * 4 + 2,
-        lightsNight: 17 * 4,
-        doorClosed: 20 * 4,
-        lightsOff: 20 * 4 + 2,
-      };
+    function parseActionTimes(responseText) {
+      const actionTimes = JSON.parse(responseText);
       console.log(actionTimes);
       $('#lightsDayDoorOpenTime').prop("value", periodToTime(actionTimes.lightsDayDoorOpen));
       $('#lightsNightTime').prop("value", periodToTime(actionTimes.lightsNight));
@@ -258,9 +265,8 @@ const char html [] PROGMEM = R"=====(
         get("lightsOff", () => showSuccessToast("Akcja wykonana poprawnie"), (err) => showErrorToast("Wystąpił błąd!", err))
     }); 
     $("#openHoursModal").button().click(function(){
-      parseActionTimes();
       $('#scheduleActionsModal').modal('show');
-        // get("actionTimes", parseActionTimes); //TODO
+      get("getActionTimes", parseActionTimes);
     }); 
     $("#openManualActionsModal").button().click(function(){
       $('#manualActionsModal').modal('show');
@@ -284,6 +290,9 @@ const char html [] PROGMEM = R"=====(
         } else {
           showErrorToast("Nieprawidłowe godziny! Popraw je i spróbuj jeszcze raz.");
         }
+    });
+    $("#switchKurnik").button().click(function(){
+        put("coornickSwitch", { previousState: kurnikTurnedOn }, () => showSuccessToast("Akcja wykonana poprawnie"), (err) => showErrorToast("Wystąpił błąd!", err))
     });
     setInterval(async () => { get("status", parseStatus);}, 5000);
     $("#alert").prop("class", "hide");
