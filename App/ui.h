@@ -1,3 +1,4 @@
+const char html [] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,3 +245,5 @@
   </script>
 </body>
 </html>
+
+)=====";

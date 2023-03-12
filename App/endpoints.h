@@ -1,9 +1,10 @@
+#include "ui.h"
+
 #ifndef STASSID
-#define STASSID "BOMBA2"
-#define STAPSK "Ziombel9/11"
+#define STASSID "SamsungGalaxyS20FE"
+#define STAPSK "mojo8645"
 #endif
 
-#define html "<!DOCTYPE html><html lang=\"en\"><head>  <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css\"    integrity=\"sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS\"    crossorigin=\"anonymous\">  <title>Kurnik Państwa Nowaków</title>  <style>    h1 {      color: grey;      text-align: center;    }    div.one {      margin-top: 40px;      text-align: center;    }    button {      margin-top: 10px;    }  </style></head><body>  <div class=\"container\">    <h1>Ko, ko, ko!</h1>    <div class=\"one\">      <div class=\"row\">        <button id=\"lightsDayDoorOpen\" type=\"button\" class=\"btn btn-light\">Otwórz drzwiczki i zapal światło dzienne</button>      </div>      <div class=\"row\">        <button id=\"lightsNight\" type=\"button\" class=\"btn btn-light\">Zapal światło nocne i zgaś dzienne</button>      </div>      <div class=\"row\">        <button id=\"doorClosed\" type=\"button\" class=\"btn btn-light\">Zamknij drzwiczki</button>      </div>      <div class=\"row\">        <button id=\"lightsOff\" type=\"button\" class=\"btn btn-light\">Zgaś światło nocne</button>      </div>    </div>    <div class=\"row\"> <p id=\"status\"></p> </div>  </div>  <!-- Optional JavaScript -->  <!-- jQuery first, then Popper.js, then Bootstrap JS -->    <script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\"    integrity=\"sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo\"    crossorigin=\"anonymous\"></script>  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js\"    integrity=\"sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut\"    crossorigin=\"anonymous\"></script>  <script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js\"    integrity=\"sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k\"    crossorigin=\"anonymous\"></script>  <script type=\"text/javascript\">    function reqListener() {      console.log(this.responseText);      $('#status').text(\"Data: \" + this.responseText);     }    function get(url, callback){      const req = new XMLHttpRequest();      if (callback) req.addEventListener(\"load\", callback);      req.open(\"GET\", window.location.href + url);      req.send();    }    $(\"#lightsDayDoorOpen\").button().click(function(){        get(\"lightsDayDoorOpen\")    });     $(\"#lightsNight\").button().click(function(){        get(\"lightsNight\")    });     $(\"#doorClosed\").button().click(function(){        get(\"doorClosed\")    });     $(\"#lightsOff\").button().click(function(){        get(\"lightsOff\")    });         setInterval(async () => { get(\"status\", reqListener);}, 5000);  </script></body></html>"
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
@@ -72,7 +73,7 @@ void handleNotFound() {
 }
 
 //from BasicHttpClient
-String httpGet(const char* endpoint) {//, void (*onSuccess)(String param1), void (*onError)()) {
+String httpGet(const char* endpoint) {
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     WiFiClient client;
@@ -80,7 +81,7 @@ String httpGet(const char* endpoint) {//, void (*onSuccess)(String param1), void
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
-    if (http.begin(client, endpoint)) {  // HTTP
+    if (http.begin(client, endpoint)) {
 
 
       Serial.print("[HTTP] GET...\n");

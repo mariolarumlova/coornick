@@ -12,10 +12,12 @@
 #include "endpoints.h"
 #include "datetimeCheck.h"
 
-const int LIGHTS_DAY_DOOR_OPEN_PERIOD = 7 * 4 + 2; // action 1
-const int LIGHTS_NIGHT_PERIOD = 17 * 4; // action 2
-const int DOOR_CLOSED_PERIOD = 20 * 4; // action 3
-const int LIGHTS_OFF_PERIOD = 20 * 4 + 2; // action 4
+// default action times [15min periods]
+int lightsDayDoorOpenPeriod = 7 * 4 + 2;
+int lightsNightPeriod = 17 * 4;
+int doorClosedPeriod = 20 * 4;
+int lightsOffPeriod = 20 * 4 + 2;
+
 int period = 100;
 int lastAction = 4;
 
@@ -49,6 +51,12 @@ void setup(void) {
   });
   setupEndpoint("/status", []() {
     getCoornickStatus();
+  });
+  setupEndpoint("/getActionTimes", []() {
+    getActionTimes();
+  });
+  setupEndpoint("/setActionTimes", []() {
+    setActionTimes();
   });
   setupEndpoint("/getTime", []() {
     datetimeCheck(httpGet, [](int newPeriod) {
@@ -108,19 +116,32 @@ void getCoornickStatus() {
   server.send(200, "application/json", buffer); 
 }
 
+void getActionTimes() {
+  //TODO
+}
+
+void setActionTimes() {
+  lightsDayDoorOpenPeriod = server.arg("lightsDayDoorOpen").toInt();
+  lightsNightPeriod = server.arg("lightsNight").toInt();
+  doorClosedPeriod = server.arg("doorClosed").toInt();
+  lightsOffPeriod = server.arg("lightsOff").toInt();
+  updatePeriod(period);
+  server.send(200, "text/plain", "Godziny zmienione");
+}
+
 void updatePeriod(int newPeriod)
 {
   if (newPeriod == 100) {
     return;
   }
   period = newPeriod;
-  if(period >= LIGHTS_OFF_PERIOD) {
-    if(lastAction != 4) lightsOff();
-  } else if(period >= DOOR_CLOSED_PERIOD) {
-    if(lastAction != 3) doorClosed();
-  } else if(period >= LIGHTS_NIGHT_PERIOD) {
-    if(lastAction != 2) lightsNight();
-  } else if(period >= LIGHTS_DAY_DOOR_OPEN_PERIOD) {
-    if(lastAction != 1) lightsDayDoorOpen();
+  if(period >= lightsOffPeriod) {
+    if(lastAction == 3) lightsOff();
+  } else if(period >= doorClosedPeriod) {
+    if(lastAction == 2) doorClosed();
+  } else if(period >= lightsNightPeriod) {
+    if(lastAction == 1) lightsNight();
+  } else if(period >= lightsDayDoorOpenPeriod) {
+    if(lastAction == 4) lightsDayDoorOpen();
   }
 }
