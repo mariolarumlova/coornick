@@ -1,12 +1,12 @@
-//clean up libraries
 #include <Arduino.h> //?
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h> //?
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPClient.h> //needed?
-#include <ArduinoJson.h>
+
 #include "lights.h"
 #include "door.h"
 #include "endpoints.h"
@@ -78,18 +78,21 @@ void lightsDayDoorOpen() {
   turnDayLightsOn();
   delay(500);
   openDoor();
+  Serial.println("Lights turned to day mode, door open");
   server.send(200, "text/plain;charset=UTF-8", "Lights: day, door: open.");
 }
 
 void lightsNight() {
   lastAction = 2;
   turnNightLightsOn();
+  Serial.println("Lights turned to night mode");
   server.send(200, "text/plain", "Lights: night, door: open.");
 }
 
 void doorClosed() {
   lastAction = 3;
   closeDoor();
+  Serial.println("Door closed");
   server.send(200, "text/plain", "Lights: night, door: closed.");
 }
 
@@ -98,6 +101,7 @@ void lightsOff() {
   turnAllLightsOff();
   stopDoor();
   lockDoor();
+  Serial.println("Lights turned off");
   server.send(200, "text/plain", "Lights: off, door: closed.");
 }
 
@@ -120,20 +124,26 @@ void setActionTimes() {
   lightsNightPeriod = server.arg("lightsNight").toInt();
   doorClosedPeriod = server.arg("doorClosed").toInt();
   lightsOffPeriod = server.arg("lightsOff").toInt();
-  datetimeCheck(httpGet, [](int newPeriod) {
-    updatePeriod(newPeriod);
-  });
+  if (coornickTurnedOn) {
+    datetimeCheck(httpGet, [](int newPeriod) {
+      updatePeriod(newPeriod);
+    });
+  }
+  Serial.println("Action times set: ");
+  Serial.println(lightsDayDoorOpenPeriod);
+  Serial.println(lightsNightPeriod);
+  Serial.println(doorClosedPeriod);
+  Serial.println(lightsOffPeriod);
   server.send(200, "text/plain", "Period times updated.");
 }
 
 void coornickSwitch() {
   int previousState = server.arg("previousState").toInt();
   coornickTurnedOn = !previousState;
-  if (coornickTurnedOn) {
-    server.send(200, "text/plain", "Coornik activated.");
-  } else {
-    server.send(200, "text/plain", "Coornik deactivated.");
-  }
+  Serial.println("Changed automation state:");
+  Serial.println(previousState);
+  Serial.println(coornickTurnedOn);
+  server.send(200, "text/plain", "Coornick state changed.");
 }
 
 void updatePeriod(int newPeriod)

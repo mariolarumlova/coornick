@@ -1,8 +1,8 @@
 #include "ui.h"
 
 #ifndef STASSID
-#define STASSID "SamsungGalaxyS20FE"
-#define STAPSK "mojo8645"
+#define STASSID "BOMBA2"
+#define STAPSK "Ziombel9/11"
 #endif
 
 const char* ssid = STASSID;

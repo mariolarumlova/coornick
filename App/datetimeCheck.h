@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+
 const unsigned long hourCheckInterval = 15 * 60 * 1000; // 15min
 unsigned long previousHourCheckTime = 0;
 const char* hourCheckUrl = "http://worldtimeapi.org/api/ip"; 
