@@ -107,8 +107,8 @@ void lightsOff() {
 
 void getCoornickStatus() {
   char buffer[200];
-  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d, \"isDoorLocked\": %d, \"isDoorOpening\": %d, \"isDoorClosing\": %d, \"coornickTurnedOn\": %d}", 
-    isDayLightOn, isNightLightOn, isDoorLocked, isDoorOpening, isDoorClosing, coornickTurnedOn);
+  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d, \"isDoorLocked\": %d, \"isDoorOpening\": %d, \"isDoorClosing\": %d, \"coornickTurnedOn\": %d, \"isDoorOpened\": %d, \"isDoorClosed\": %d, \"lastAction\": %d}", 
+    isDayLightOn, isNightLightOn, isDoorLocked, isDoorOpening, isDoorClosing, coornickTurnedOn, isDoorOpened, isDoorClosed, lastAction);
   server.send(200, "application/json", buffer); 
 }
 
@@ -148,7 +148,7 @@ void coornickSwitch() {
 
 void updatePeriod(int newPeriod)
 {
-  if (newPeriod == 100) {
+  if (newPeriod == INVALID_PERIOD) {
     return;
   }
   period = newPeriod;

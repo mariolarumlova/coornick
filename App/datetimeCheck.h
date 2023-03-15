@@ -1,12 +1,13 @@
 #include <ArduinoJson.h>
 
-const unsigned long hourCheckInterval = 15 * 60 * 1000; // 15min
+const unsigned long HOUR_CHECK_INTERVAL = 15 * 60 * 1000; // 15min
 unsigned long previousHourCheckTime = 0;
 const char* hourCheckUrl = "http://worldtimeapi.org/api/ip"; 
 int Year, Month, Day, Hour, Minute;
+const int INVALID_PERIOD = 100;
 
 int parseDateTime(String payload) {
-  int period = 100;
+  int period = INVALID_PERIOD;
   StaticJsonDocument<800> doc;
   DeserializationError error = deserializeJson(doc, payload);
 
@@ -39,7 +40,7 @@ void datetimeCheck(String (*httpGet)(const char* url), void (*callback)(int newP
 
 void loopDatetimeCheck(String (*httpGet)(const char* url), void (*callback)(int newPeriod)) {  
   unsigned long currentTime = millis();
-  if( currentTime - previousHourCheckTime >= hourCheckInterval ){
+  if( currentTime - previousHourCheckTime >= HOUR_CHECK_INTERVAL ){
     datetimeCheck((*httpGet), (*callback));
   }
 }

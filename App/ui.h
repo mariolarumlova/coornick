@@ -76,10 +76,10 @@ const char html [] PROGMEM = R"=====(
               <div class="col-lg-6 col-xxl-4 mb-5">
                   <div class="card bg-light border-0 h-100">
                       <div class="card-body text-center p-4 p-lg-5">
-                          <div id="switchKurnikIcon" class="feature bg-secondary bg-gradient text-white rounded-3"><i class="bi bi-house"></i></div>
+                          <div id="switchKurnikIcon" class="feature bg-light bg-gradient text-white rounded-3"><i class="bi bi-house"></i></div>
                           <h2 class="fs-4 pt-3 pb-3 fw-bold">Automatyzacja</h2>
                           <button id="switchKurnik" type="button" class="btn btn-danger">
-                            <span id="switchKurnikButtonText">. . .</span>
+                            <span id="switchKurnikButtonText">Ładowanie...</span>
                           </button>
                       </div>
                   </div>
@@ -87,27 +87,27 @@ const char html [] PROGMEM = R"=====(
               <div class="col-lg-6 col-xxl-4 mb-5">
                   <div class="card bg-light border-0 h-100">
                       <div class="card-body text-center p-4 p-lg-5">
-                          <div id="doorIcon" class="feature bg-secondary bg-gradient text-white rounded-3"><i class="bi bi-door-closed"></i></div>
+                          <div id="doorIcon" class="feature bg-light bg-gradient text-white rounded-3"><i class="bi bi-door-closed"></i></div>
                           <h2 class="fs-4 pt-3 fw-bold">Drzwiczki</h2>
-                          <p id="doorText" class="mb-0">. . .</p>
+                          <p id="doorText" class="mb-0">Ładowanie...</p>
                       </div>
                   </div>
               </div>
               <div class="col-lg-6 col-xxl-4 mb-5">
                   <div class="card bg-light border-0 h-100">
                       <div class="card-body text-center p-4 p-lg-5">
-                          <div id="dayLightIcon" class="feature bg-secondary bg-gradient text-white rounded-3"><i class="bi bi-lightbulb-fill"></i></div>
+                          <div id="dayLightIcon" class="feature bg-light bg-gradient text-white rounded-3"><i class="bi bi-lightbulb-fill"></i></div>
                           <h2 class="fs-4 pt-3 fw-bold">Światło dzienne</h2>
-                          <p id="dayLightText" class="mb-0">. . .</p>
+                          <p id="dayLightText" class="mb-0">Ładowanie...</p>
                       </div>
                   </div>
               </div>
               <div class="col-lg-6 col-xxl-4 mb-5">
                   <div class="card bg-light border-0 h-100">
                       <div class="card-body text-center p-4 p-lg-5">
-                          <div id="nightLightIcon" class="feature bg-secondary bg-gradient text-white rounded-3"><i class="bi bi-lightbulb"></i></div>
+                          <div id="nightLightIcon" class="feature bg-light bg-gradient text-white rounded-3"><i class="bi bi-lightbulb"></i></div>
                           <h2 class="fs-4 pt-3 fw-bold">Światło nocne</h2>
-                          <p id="nightLightText" class="mb-0">. . .</p>
+                          <p id="nightLightText" class="mb-0">Ładowanie...</p>
                       </div>
                   </div>
               </div>
@@ -212,11 +212,12 @@ const char html [] PROGMEM = R"=====(
       const iconBackgroundClassPrefix = "feature bg-gradient text-white rounded-3";
       $('#switchKurnikButtonText').text(response.coornickTurnedOn ? "WYŁĄCZ" : "WŁĄCZ"); 
       $('#switchKurnikIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.coornickTurnedOn ? "bg-success" : "bg-secondary"}`);
-      $('#doorIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.isDoorLocked || response.isDoorOpening || response.isDoorClosing 
-        ? "bg-secondary" : "bg-success"}`);
-      $('#doorText').text(response.isDoorLocked ? "Zamknięte" 
-        : response.isDoorOpening ? "Otwieranie..." 
-        : response.isDoorClosing ? "Zamykanie..." : "Otwarte");
+      $('#doorIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.isDoorClosed || response.isDoorOpening || response.isDoorClosing 
+        ? "bg-secondary" : response.isDoorOpened ? "bg-success" : "bg-danger"}`);
+      $('#doorText').text(response.isDoorOpening ? "Otwieranie..." 
+        : response.isDoorClosing ? "Zamykanie..." 
+        : response.isDoorOpened ? "Otwarte"
+        : response.isDoorClosed ? "Zamknięte" : "Błąd");
       $('#dayLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.dayLights ? "bg-success" : "bg-secondary"}`);
       $('#dayLightText').text(response.dayLights ? "Włączone" : "Wyłączone"); 
       $('#nightLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.nightLights ? "bg-success" : "bg-secondary"}`);
@@ -342,7 +343,7 @@ const char html [] PROGMEM = R"=====(
           (err) => showErrorToast("Wystąpił błąd!", err)
         )
     });
-    setInterval(async () => { get("status", parseStatus);}, 7000);
+    setInterval(async () => { get("status", parseStatus);}, 5000);
     $("#alert").prop("class", "hide");
   </script>
 </body>
