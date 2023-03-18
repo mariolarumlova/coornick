@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="https://png.pngtree.com/png-clipart/20230120/ourmid/pngtree-cute-chicken-png-image_6563222.png">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="author" content="AltoDev" />
@@ -8,7 +9,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
     crossorigin="anonymous">
-  <title>Kurnik Państwa Nowaków</title>
+  <title>Smart Kurnik</title>
   <style>
     .feature {
       display: inline-flex;
@@ -46,7 +47,7 @@
       <div class="container px-lg-5">
           <a class="navbar-brand" href="#!">
             <img style="height: 80px;" src="https://png.pngtree.com/png-clipart/20230120/ourmid/pngtree-cute-chicken-png-image_6563222.png" alt="logo" border="0">
-            C O O R N I C K
+            SMART KURNIK
           </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -342,6 +343,7 @@
           (err) => showErrorToast("Wystąpił błąd!", err)
         )
     });
+    get("status", parseStatus);
     setInterval(async () => { get("status", parseStatus);}, 5000);
     $("#alert").prop("class", "hide");
   </script>

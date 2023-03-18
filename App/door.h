@@ -23,8 +23,6 @@ void openDoor() {
   digitalWrite(ENGINE_IN_2, LOW);
   isDoorOpening = 1;
   isDoorClosing = 0;
-  isDoorOpened = 0;
-  isDoorClosed = 0;
 }
 
 void closeDoor() {
@@ -32,8 +30,6 @@ void closeDoor() {
   digitalWrite(ENGINE_IN_2, HIGH);
   isDoorOpening = 0;
   isDoorClosing = 1;
-  isDoorOpened = 0;
-  isDoorClosed = 0;
 }
 
 void stopDoor() {
@@ -54,17 +50,21 @@ void unlockDoor() {
 }
 
 void checkDoorOpened() {
-  if (digitalRead(SENSOR_DOOR_OPEN) == HIGH && isDoorOpening == 1) {
-    stopDoor();
-    lockDoor();
+  if (digitalRead(SENSOR_DOOR_OPEN) == HIGH) {
+    if (isDoorOpening == 1) {
+      stopDoor();
+      lockDoor();
+    }
     isDoorOpened = 1;
     isDoorClosed = 0;
   }
 }
 
 void checkDoorClosed() {
-  if (digitalRead(SENSOR_DOOR_CLOSED) == HIGH && isDoorClosing == 1) {
-    stopDoor();
+  if (digitalRead(SENSOR_DOOR_CLOSED) == HIGH) {
+    if (isDoorClosing == 1) {
+      stopDoor();
+    }
     isDoorOpened = 0;
     isDoorClosed = 1;
   }

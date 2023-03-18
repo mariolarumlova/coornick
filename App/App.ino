@@ -1,12 +1,3 @@
-#include <Arduino.h> //?
-
-#include <ESP8266WiFi.h>
-#include <ESP8266WiFiMulti.h> //?
-#include <WiFiClient.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
-#include <ESP8266HTTPClient.h> //needed?
-
 #include "lights.h"
 #include "door.h"
 #include "endpoints.h"
@@ -152,13 +143,13 @@ void updatePeriod(int newPeriod)
     return;
   }
   period = newPeriod;
-  if(period >= lightsOffPeriod) {
-    if(lastAction == 3) lightsOff();
-  } else if(period >= doorClosedPeriod) {
-    if(lastAction == 2) doorClosed();
-  } else if(period >= lightsNightPeriod) {
-    if(lastAction == 1) lightsNight();
-  } else if(period >= lightsDayDoorOpenPeriod) {
-    if(lastAction == 4) lightsDayDoorOpen();
+  if(lastAction == 3) {
+    if(period >= lightsOffPeriod) lightsOff();
+  } else if(lastAction == 2) {
+    if(period >= doorClosedPeriod) doorClosed();
+  } else if(lastAction == 1) {
+    if(period >= lightsNightPeriod) lightsNight();
+  } else if(lastAction == 4) {
+    if(period >= lightsDayDoorOpenPeriod) lightsDayDoorOpen();
   }
 }
