@@ -17,9 +17,9 @@ void turnDayLightsOn() {
 }
 
 void turnNightLightsOn() {
-  digitalWrite(LIGHTS_DAY_RELAY_PIN, HIGH);
+  digitalWrite(LIGHTS_DAY_RELAY_PIN, LOW);
   digitalWrite(LIGHTS_NIGHT_RELAY_PIN, LOW);
-  isDayLightOn = 0;
+  isDayLightOn = 1;
   isNightLightOn = 1;
 }
 

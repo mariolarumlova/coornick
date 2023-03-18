@@ -243,7 +243,7 @@ const char html [] PROGMEM = R"=====(
       return lastAction === 3 || lastAction === 4;
     }
     function areDayLightsAsScheduled (dayLights, lastAction) {
-      return dayLights ? lastAction === 1 : lastAction > 1;
+      return dayLights ? lastAction !== 4 : lastAction === 4;
     }
     function areNightLightsAsScheduled(nightLights, lastAction) {
       if (nightLights) {
