@@ -212,17 +212,43 @@
       const iconBackgroundClassPrefix = "feature bg-gradient text-white rounded-3";
       $('#switchKurnikButtonText').text(response.coornickTurnedOn ? "WYŁĄCZ" : "WŁĄCZ"); 
       $('#switchKurnikIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.coornickTurnedOn ? "bg-success" : "bg-secondary"}`);
-      $('#doorIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.isDoorClosed || response.isDoorOpening || response.isDoorClosing 
-        ? "bg-secondary" : response.isDoorOpened ? "bg-success" : "bg-danger"}`);
-      $('#doorText').text(response.isDoorOpening ? "Otwieranie..." 
-        : response.isDoorClosing ? "Zamykanie..." 
-        : response.isDoorOpened ? "Otwarte"
-        : response.isDoorClosed ? "Zamknięte" : "Błąd");
-      $('#dayLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.dayLights ? "bg-success" : "bg-secondary"}`);
-      $('#dayLightText').text(response.dayLights ? "Włączone" : "Wyłączone"); 
-      $('#nightLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.nightLights ? "bg-success" : "bg-secondary"}`);
-      $('#nightLightText').text(response.nightLights ? "Włączone" : "Wyłączone"); 
       kurnikTurnedOn = response.coornickTurnedOn;
+      $('#dayLightText').text(response.dayLights ? "Włączone" : "Wyłączone");
+      $('#nightLightText').text(response.nightLights ? "Włączone" : "Wyłączone"); 
+      $('#doorText').text(response.isDoorOpening ? "Otwieranie..." 
+          : response.isDoorClosing ? "Zamykanie..." 
+          : response.isDoorOpened ? "Otwarte"
+          : response.isDoorClosed ? "Zamknięte" : "Błąd");
+      if (response.lastActionManual) {
+        $('#doorIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.isDoorClosed || response.isDoorOpened 
+          ? "bg-success" : response.isDoorOpening || response.isDoorClosing ? "bg-secondary" : "bg-danger"}`);
+        $('#dayLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.dayLights ? "bg-success" : "bg-secondary"}`);
+        $('#nightLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${response.nightLights ? "bg-success" : "bg-secondary"}`);
+      } else {
+        $('#doorIcon').prop( "class", `${iconBackgroundClassPrefix} ${(shouldDoorBeOpen(response.lastAction) && response.isDoorOpened)
+          || (shouldDoorBeClosed(response.lastAction) && response.isDoorClosed)? "bg-success" : "bg-danger"}`);
+        const dayLightsOk = areDayLightsAsScheduled(response.dayLights, response.lastAction);
+        $('#dayLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${ dayLightsOk && response.dayLights ? "bg-success" 
+          : dayLightsOk && !response.dayLights ? "bg-secondary" : "bg-danger"}`);
+        const nightLightsOk = areNightLightsAsScheduled(response.nightLights, response.lastAction);
+        $('#nightLightIcon').prop( "class", `${iconBackgroundClassPrefix} ${ nightLightsOk && response.nightLights ? "bg-success" 
+          : nightLightsOk && !response.nightLights ? "bg-secondary" : "bg-danger"}`);
+      }
+    }
+    function shouldDoorBeOpen(lastAction) {
+      return lastAction === 1 || lastAction === 2;
+    }
+    function shouldDoorBeClosed (lastAction) {
+      return lastAction === 3 || lastAction === 4;
+    }
+    function areDayLightsAsScheduled (dayLights, lastAction) {
+      return dayLights ? lastAction === 1 : lastAction > 1;
+    }
+    function areNightLightsAsScheduled(nightLights, lastAction) {
+      if (nightLights) {
+        return lastAction === 2 || lastAction === 3;
+      }
+      return lastAction === 1 || lastAction === 4;
     }
     function periodToTime(period) {
       const hours = `${Math.floor(period / 4)}`.padStart(2, '0');

@@ -13,6 +13,7 @@ int lightsOffPeriod = 20 * 4 + 2;
 
 int period = 100;
 int lastAction = 4;
+bool lastActionManual = false;
 
 void setup(void) {
   setupLights();
@@ -20,15 +21,19 @@ void setup(void) {
 
   setupServer();
   setupEndpoint("/lightsDayDoorOpen", []() {
+    lastActionManual = true;
     lightsDayDoorOpen();
   });
   setupEndpoint("/lightsNight", []() {
+    lastActionManual = true;
     lightsNight();
   });
   setupEndpoint("/doorClosed", []() {
+    lastActionManual = true;
     doorClosed();
   });
   setupEndpoint("/lightsOff", []() {
+    lastActionManual = true;
     lightsOff();
   });
   setupEndpoint("/status", []() {
@@ -98,8 +103,8 @@ void lightsOff() {
 
 void getCoornickStatus() {
   char buffer[200];
-  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d, \"isDoorLocked\": %d, \"isDoorOpening\": %d, \"isDoorClosing\": %d, \"coornickTurnedOn\": %d, \"isDoorOpened\": %d, \"isDoorClosed\": %d, \"lastAction\": %d}", 
-    isDayLightOn, isNightLightOn, isDoorLocked, isDoorOpening, isDoorClosing, coornickTurnedOn, isDoorOpened, isDoorClosed, lastAction);
+  sprintf(buffer, "{\"dayLights\": %d, \"nightLights\": %d, \"isDoorLocked\": %d, \"isDoorOpening\": %d, \"isDoorClosing\": %d, \"coornickTurnedOn\": %d, \"isDoorOpened\": %d, \"isDoorClosed\": %d, \"lastAction\": %d, \"lastActionManual\": %d}", 
+    isDayLightOn, isNightLightOn, isDoorLocked, isDoorOpening, isDoorClosing, coornickTurnedOn, isDoorOpened, isDoorClosed, lastAction, lastActionManual);
   server.send(200, "application/json", buffer); 
 }
 
@@ -143,6 +148,7 @@ void updatePeriod(int newPeriod)
     return;
   }
   period = newPeriod;
+  lastActionManual = false;
   if(lastAction == 3) {
     if(period >= lightsOffPeriod) lightsOff();
   } else if(lastAction == 2) {
